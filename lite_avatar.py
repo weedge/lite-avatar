@@ -183,7 +183,9 @@ class liteAvatar(object):
         if thread_id == 0:
             out_queue.put(None)
 
-    def param2img(self, param_res, bg_frame_id, global_frame_id=0, is_idle=False):
+    def param2img(
+        self, param_res: dict, bg_frame_id: int, global_frame_id=0, is_idle=False
+    ) -> torch.Tensor:
         param_val = []
         for key in param_res:
             val = param_res[key]
@@ -205,7 +207,9 @@ class liteAvatar(object):
             tmp_json[str(ii)] = float(bg_param[ii])
         return tmp_json
 
-    def merge_mouth_to_bg(self, mouth_image, bg_frame_id, use_bg=False):
+    def merge_mouth_to_bg(
+        self, mouth_image: torch.Tensor, bg_frame_id: int, use_bg: bool = False
+    ) -> tuple[np.ndarray, np.ndarray]:
         mouth_image = (mouth_image / 2 + 0.5).clamp(0, 1)
         mouth_image = mouth_image[0].permute(1, 2, 0) * 255
 
@@ -214,6 +218,7 @@ class liteAvatar(object):
         mouth_image = mouth_image[:, :, ::-1]
         full_img = self.bg_data_list[bg_frame_id].copy()
         if not use_bg:
+            # image no bg, use default bg
             full_img[self.y1 : self.y2, self.x1 : self.x2, :] = (
                 mouth_image * (1 - self.merge_mask)
                 + full_img[self.y1 : self.y2, self.x1 : self.x2, :] * self.merge_mask
