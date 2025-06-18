@@ -89,8 +89,8 @@ class liteAvatar(object):
         self.encoder = torch.jit.load(f"{data_dir}/net_encode.pt").to(self.device)
         self.generator = torch.jit.load(f"{data_dir}/net_decode.pt").to(self.device)
 
-        self.load_data_sync(data_dir=data_dir, bg_frame_cnt=150)
-        self.load_data(data_dir=data_dir, bg_frame_cnt=150)
+        self.load_pos_bg_video_image_frames(data_dir=data_dir, bg_frame_cnt=150)
+        self.load_ref_mouth_images(data_dir=data_dir, bg_frame_cnt=150)
         self.ref_data_list = [0 for x in range(150)]
         self.input_queue = queue.Queue()
         self.output_queue = queue.Queue()
@@ -99,7 +99,8 @@ class liteAvatar(object):
     def unload_dynamic_model(self):
         pass
 
-    def load_data_sync(self, data_dir, bg_frame_cnt=None):
+    def load_pos_bg_video_image_frames(self, data_dir, bg_frame_cnt=None):
+        """load pos np.ndarray and bg video image frames"""
         t = time.time()
         self.neutral_pose = np.load(f"{data_dir}/neutral_pose.npy")
         self.mouth_scale = None
@@ -137,7 +138,8 @@ class liteAvatar(object):
         )
         logging.info(f"load data sync in {time.time() - t:.3f}s")
 
-    def load_data(self, data_dir, bg_frame_cnt=None):
+    def load_ref_mouth_images(self, data_dir, bg_frame_cnt=None):
+        """load ref mouth images from bg_video.mp4"""
         logging.info(f"loading data from {data_dir}")
         s = time.time()
 
@@ -378,10 +380,21 @@ class liteAvatar(object):
 
 
 """
-python lite_avatar.py \
-    --weight_dir /Users/wuyong/project/python/OpenAvatarChat/src/handlers/avatar/liteavatar/algo/liteavatar/weights \
-    --data_dir /Users/wuyong/project/python/OpenAvatarChat/resource/avatar/liteavatar/20250408/preload \
-    --audio_file /Users/wuyong/project/python/chat-bot/test/audio_files/asr_example_zh.wav \
+huggingface-cli download weege007/liteavatar --local-dir ./models/weege007/liteavatar
+modelscope download --model HumanAIGC-Engineering/LiteAvatarGallery 20250408/sample_data.zip --local_dir ./resources/avatar/liteavatar
+unzip ./resources/avatar/liteavatar/20250408/sample_data.zip -d ./resources/avatar/liteavatar/20250408
+PYTHONPATH=$PYTHONPATH:./deps/LiteAvatar python -m deps.LiteAvatar.lite_avatar \
+    --weight_dir ./models/weege007/liteavatar \
+    --data_dir ./resources/avatar/liteavatar/20250408/sample_data \
+    --audio_file ./test/audio_files/asr_example_zh.wav \
+    --result_dir ./
+
+modelscope download --model HumanAIGC-Engineering/LiteAvatarGallery 20250612/P1-64AzfrJY037WpS69RiUMw.zip --local_dir ./resources/avatar/liteavatar
+unzip ./resources/avatar/liteavatar/20250612/P1-64AzfrJY037WpS69RiUMw.zip -d ./resources/avatar/liteavatar/20250612
+PYTHONPATH=$PYTHONPATH:./deps/LiteAvatar python -m deps.LiteAvatar.lite_avatar \
+    --weight_dir ./models/weege007/liteavatar \
+    --data_dir ./resources/avatar/liteavatar/20250612/P1-64AzfrJY037WpS69RiUMw \
+    --audio_file ./test/audio_files/asr_example_zh.wav \
     --result_dir ./
 """
 if __name__ == "__main__":
