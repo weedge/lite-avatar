@@ -94,7 +94,7 @@ class liteAvatar(object):
         self.ref_data_list = [0 for x in range(150)]
         self.input_queue = queue.Queue()
         self.output_queue = queue.Queue()
-        logging.info("load dynamic model in {:.3f}s", time.time() - start_time)
+        logging.info(f"load dynamic model in {time.time() - start_time:.3f}s")
 
     def unload_dynamic_model(self):
         pass
@@ -135,7 +135,7 @@ class liteAvatar(object):
                 transforms.Normalize([0.5], [0.5]),
             ]
         )
-        logging.info("load data sync in {:.3f}s", time.time() - t)
+        logging.info(f"load data sync in {time.time() - t:.3f}s")
 
     def load_data(self, data_dir, bg_frame_cnt=None):
         logging.info(f"loading data from {data_dir}")
@@ -267,7 +267,7 @@ class liteAvatar(object):
                 tmp_json[key] = (param_res[-1][key] - end_value) * scale + end_value
             padding_list.append(tmp_json)
 
-        print("padding_cnt:", len(padding_list))
+        logging.info(f"padding_cnt:{len(padding_list)}")
         param_res = param_res + padding_list
         return param_res
 
@@ -360,7 +360,7 @@ class liteAvatar(object):
             with wave.open(file_path, "rb") as wav_file:
                 # 获取WAV文件的参数
                 params = wav_file.getparams()
-                print(
+                logging.info(
                     f"Channels: {params.nchannels}, Sample Width: {params.sampwidth}, Frame Rate: {params.framerate}, Number of Frames: {params.nframes}"
                 )
 
@@ -368,7 +368,7 @@ class liteAvatar(object):
                 frames = wav_file.readframes(params.nframes)
                 return frames
         except wave.Error as e:
-            print(f"Error reading WAV file: {e}")
+            logging.warning(f"Error reading WAV file: {e}")
             return None
 
 
@@ -387,7 +387,14 @@ if __name__ == "__main__":
     parser.add_argument("--audio_file", type=str)
     parser.add_argument("--result_dir", type=str)
     parser.add_argument("--weight_dir", type=str)
+    parser.add_argument("--log_level", type=str, default="INFO")
     args = parser.parse_args()
+
+    log_format = "%(asctime)s - %(name)s - %(levelname)s - %(pathname)s:%(lineno)d - %(funcName)s - %(message)s"
+    logging.basicConfig(
+        level=args.log_level,
+        format=log_format,
+    )
 
     audio_file = args.audio_file
     tmp_frame_dir = args.result_dir
