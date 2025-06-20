@@ -3,3 +3,4 @@ __pycache__
 /results/
 tmp_frames
 *.mp4
+.DS_Store
