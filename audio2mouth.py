@@ -54,7 +54,6 @@ class Audio2Mouth(object):
             "lfr_m": 7,
             "lfr_n": 6,
         }
-        device = "cpu"
         token_type: Optional[str] = None
         bpemodel: Optional[str] = None
         dtype: str = "float32"
@@ -71,7 +70,7 @@ class Audio2Mouth(object):
             lm_file=lm_file,
             token_type=token_type,
             bpemodel=bpemodel,
-            device=device,
+            device=self.device,
             maxlenratio=maxlenratio,
             minlenratio=minlenratio,
             dtype=dtype,

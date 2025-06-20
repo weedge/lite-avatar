@@ -1091,12 +1091,12 @@ class ASRTaskParaformer(ASRTask):
                     model_dir, "{}.pb".format(model_name))
                 if os.path.exists(model_name_pth):
                     logging.info("model_file is load from pth: {}".format(model_name_pth))
-                    model_dict = torch.load(model_name_pth, map_location=device)
+                    model_dict = torch.load(model_name_pth, map_location=device, weights_only=True)
                 else:
                     model_dict = cls.convert_tf2torch(model, model_file)
                 model.load_state_dict(model_dict)
             else:
-                model_dict = torch.load(model_file, map_location=device)
+                model_dict = torch.load(model_file, map_location=device, weights_only=True)
         model.load_state_dict(model_dict)
         if model_name_pth is not None and not os.path.exists(model_name_pth):
             torch.save(model_dict, model_name_pth)
